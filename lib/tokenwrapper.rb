@@ -2,6 +2,7 @@ require './tokenwrapper/version'
 require 'net/http'
 require 'uri'
 require 'json'
+require 'date'
 
 module Tokenwrapper
   def Tokenwrapper.getToken	
@@ -18,7 +19,23 @@ module Tokenwrapper
     response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
       http.request(request)
     end
-	response
+	if response.code.eql?("200")
+      t = Token.new(response)
+	end
+	t
   end
-getToken
+  
+  class Token
+    def initialize(apiResponse)
+      tempHash = JSON.parse(apiResponse.body)
+	  @tcode = tempHash["token"]
+	  @texpiration = DateTime.parse(tempHash["expires_at"])
+	end
+	def getCode
+	  @tcode
+	end
+	def getExpireTime
+	  @texpiration
+	end
+  end
 end
