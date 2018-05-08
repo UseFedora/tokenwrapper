@@ -51,5 +51,3 @@ module Tokenwrapper
 	end
   end
 end
-puts Tokenwrapper.getToken.getCode
-puts Tokenwrapper.getToken.getCode
