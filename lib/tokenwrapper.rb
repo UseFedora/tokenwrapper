@@ -27,10 +27,10 @@ module Tokenwrapper
 	end
 	tempHash = JSON.parse(response.body)
 	tempHash["lists"]
-	puts response.body
+	response.body
   end
 
-  def Tokenwrapper.postList(listName)
+  def Tokenwrapper.postList?(listName)
     t = Tokenwrapper.getToken
 	uri = URI.parse("http://todoable.teachable.tech/api/lists")
 	request = Net::HTTP::Post.new(uri)
@@ -52,28 +52,6 @@ module Tokenwrapper
     response.code == "201"
   end
 
-  def getList(id)
-    
-    t = Tokenwrapper.getToken
-	
-	uri = URI.parse("http://todoable.teachable.tech/api/lists/%d" %id)
-	request = Net::HTTP::Get.new(uri)
-	request.content_type = "application/json"
-	request["Authorization"] = "Token token=\"%s\"" % t.getCode
-	request["Accept"] = "application/json"
-
-	req_options = {
-	  use_ssl: uri.scheme == "https",
-	}
-
-	response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
-	  http.request(request)
-	end
-	tempHash = JSON.parse(response.body)
-	tempHash["lists"]
-	puts response.body
-  end
-
   def Tokenwrapper.patchList(id, patchName)
     t = Tokenwrapper.getToken
 	uri = URI.parse("http://todoable.teachable.tech/api/lists/%d" %id)
@@ -93,7 +71,101 @@ module Tokenwrapper
     response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
 	  http.request(request)
 	end
-    response.code == "201"
+  end
+
+  def Tokenwrapper.deleteList?(id)
+    t = Tokenwrapper.getToken
+	uri = URI.parse("http://todoable.teachable.tech/api/lists/%d" %id)
+	request = Net::HTTP::Delete.new(uri)
+	request.content_type = "application/json"
+	request["Authorization"] = "Token token=\"%s\"" % t.getCode
+	request["Accept"] = "application/json"
+	
+	req_options = {
+	  use_ssl: uri.scheme == "https",
+	}
+
+    response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
+	  http.request(request)
+	end
+    response.code == "204"
+  end
+  
+  def Tokenwrapper.getList(listID)
+    t = Tokenwrapper.getToken
+	uri = URI.parse("http://todoable.teachable.tech/api/lists/%d" %listID)
+	request = Net::HTTP::Get.new(uri)
+	request.content_type = "application/json"
+	request["Authorization"] = "Token token=\"%s\"" % t.getCode
+	request["Accept"] = "appication/json"
+
+	req_options = {
+      use_ssl: uri.scheme == "https"
+	}
+
+	response = Net::HTTP::start(uri.hostname, uri.port, req_options) do |http|
+	  http.request(request)
+	end
+	response.body
+  end
+
+  def Tokenwrapper.postItem?(listID, item)
+    t = Tokenwrapper.getToken
+	uri = URI.parse("http://todoable.teachable.tech/api/lists/%d/items" %listID)
+	request = Net::HTTP::Post.new(uri)
+	request.content_type = "application/json"
+	request["Authorization"] = "Token token=\"%s\"" % t.getCode
+	request["Accept"] = "application/json"
+	request.body = "{
+	  \"item\": {
+	      \"name\": \"%s\"
+		    }
+		}"%item
+	
+	req_options = {
+	  use_ssl: uri.scheme == "https",
+	}
+
+    response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
+	  http.request(request)
+	end
+	response.code == "201"
+  end
+
+  def Tokenwrapper.deleteItem?(listID,itemID) 
+    t = Tokenwrapper.getToken
+	uri = URI.parse("http://todoable.teachable.tech/api/lists/%d/%d" %[listID, itemID])
+	request = Net::HTTP::Delete.new(uri)
+	request.content_type = "application/json"
+	request["Authorization"] = "Token token=\"%s\"" % t.getCode
+	request["Accept"] = "application/json"
+	
+	req_options = {
+	  use_ssl: uri.scheme == "https",
+	}
+
+    response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
+	  http.request(request)
+	end
+    response.code == "204"
+  end
+  
+  def Tokenwrapper.markItemDone?(listID, itemID)
+	t = Tokenwrapper.getToken
+	uri = URI.parse("http://todoable.teachable.tech/api/lists/%d/%d/finish" %[listID, itemID])
+	request = Net::HTTP::Put.new(uri)
+	request.content_type = "application/json"
+	request["Authorization"] = "Token token=\"%s\"" % t.getCode
+	request["Accept"] = "application/json"
+	
+	req_options = {
+	  use_ssl: uri.scheme == "https",
+	}
+
+    response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
+	  http.request(request)
+	end
+	response.code == "200"
   end
 
   class Token
@@ -144,7 +216,6 @@ module Tokenwrapper
 		getInstance
 	  end
 	end
+	private_class_method :initialize
   end
 end
-Tokenwrapper.getAllLists
-Tokenwrapper.patchList(1, "dw about it")
