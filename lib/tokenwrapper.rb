@@ -74,6 +74,28 @@ module Tokenwrapper
 	puts response.body
   end
 
+  def patchList(id, patchName)
+    t = Tokenwrapper.getToken
+	uri = URI.parse("http://todoable.teachable.tech/api/lists/%d" %id)
+	request = Net::HTTP::Post.new(uri)
+	request.content_type = "application/json"
+	request["Authorization"] = "Token token=\"%s\"" % t.getCode
+	request["Accept"] = "application/json"
+	request.body = "list {
+						   name: %s
+						 }
+					}" %patchName
+	
+	req_options = {
+	  use_ssl: uri.scheme == "https",
+	}
+
+    response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
+	  http.request(request)
+	end
+    response.code == "201"
+  end
+
   class Token
     $instance = nil
 	def initialize  	 
