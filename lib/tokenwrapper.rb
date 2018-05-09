@@ -74,10 +74,10 @@ module Tokenwrapper
 	puts response.body
   end
 
-  def patchList(id, patchName)
+  def Tokenwrapper.patchList(id, patchName)
     t = Tokenwrapper.getToken
 	uri = URI.parse("http://todoable.teachable.tech/api/lists/%d" %id)
-	request = Net::HTTP::Post.new(uri)
+	request = Net::HTTP::Patch.new(uri)
 	request.content_type = "application/json"
 	request["Authorization"] = "Token token=\"%s\"" % t.getCode
 	request["Accept"] = "application/json"
@@ -146,3 +146,5 @@ module Tokenwrapper
 	end
   end
 end
+Tokenwrapper.getAllLists
+Tokenwrapper.patchList(1, "dw about it")
